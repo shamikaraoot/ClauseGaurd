@@ -16,7 +16,7 @@ app = FastAPI(title="ClauseGuard API", version="1.0.0")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://clawse-guard.vercel.app"],
+    allow_origins=["https://clauseguardai.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
