@@ -35,13 +35,13 @@ Context (summary of the analyzed Terms and Conditions):
 
 User Question: {question}
 
-Provide a clear, concise answer based on the context. If the question cannot be answered from the context, say so politely.
+Provide a clear, concise answer in English based on the context. If the question cannot be answered from the context, say so politely. Always respond in English regardless of the question language.
 """
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that answers questions about legal documents. Be clear and concise."},
+                {"role": "system", "content": "You are a helpful assistant that answers questions about legal documents. Be clear and concise. Always respond in English regardless of the question language."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,

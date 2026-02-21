@@ -8,6 +8,7 @@ ClauseGuard is a full-stack application that helps users understand Terms and Co
 
 - 📄 **Text & URL Analysis**: Paste Terms & Conditions text or provide a URL to scrape
 - 🌐 **Production-Ready Scraper**: Multi-strategy web scraping (requests → httpx → Playwright) handles bot detection, JavaScript rendering, and blocked requests
+- 🌍 **Multilingual Support**: Analyzes Terms & Conditions in any language and provides summaries in English
 - 🤖 **AI-Powered Analysis**: Uses OpenAI GPT to detect payment clauses, auto-renewals, data collection, third-party sharing, and risky legal clauses
 - ⚠️ **Risk Scoring**: Provides Low/Medium/High risk assessment with color-coded indicators
 - 📋 **Alert System**: Generates bullet-point alerts for concerning clauses
@@ -230,6 +231,7 @@ Ask questions about the analyzed document.
 ## Notes
 
 - **OpenAI API Key**: The application works without an API key using rule-based analysis, but for best results, add your OpenAI API key to `backend/.env`
+- **Multilingual Support**: When OpenAI API is configured, the system can analyze Terms & Conditions in any language and will always provide summaries and alerts in English. The rule-based fallback works best with English text.
 - **CORS**: The backend is configured to accept requests from `localhost:5173` (Vite default) and `localhost:3000`
 - **Error Handling**: The application includes comprehensive error handling and user-friendly error messages
 - **Fallback Mode**: If OpenAI API is not available, the system automatically falls back to rule-based pattern matching

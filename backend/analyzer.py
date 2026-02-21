@@ -38,9 +38,11 @@ def analyze_with_openai(text: str) -> Dict[str, any]:
         text_to_analyze = text[:max_chars] if len(text) > max_chars else text
 
         prompt = f"""Analyze the following Terms and Conditions text and provide:
-1. A simplified summary (2-3 sentences)
+1. A simplified summary (2-3 sentences) IN ENGLISH
 2. A risk score: Low, Medium, or High
-3. A list of alerts (bullet points) for concerning clauses
+3. A list of alerts (bullet points) for concerning clauses IN ENGLISH
+
+IMPORTANT: Summarize in English regardless of the original language of the text.
 
 Focus on detecting:
 - Payment clauses and hidden fees
@@ -49,21 +51,21 @@ Focus on detecting:
 - Third-party data sharing
 - Risky legal clauses (arbitration, liability waivers, etc.)
 
-Text to analyze:
+Text to analyze (may be in any language):
 {text_to_analyze}
 
-Respond in this exact JSON format:
+Respond in this exact JSON format (all text must be in English):
 {{
-  "summary": "Brief summary here",
+  "summary": "Brief summary here in English",
   "risk_score": "Low|Medium|High",
-  "alerts": ["Alert 1", "Alert 2", "Alert 3"]
+  "alerts": ["Alert 1 in English", "Alert 2 in English", "Alert 3 in English"]
 }}
 """
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a legal analysis assistant. Always respond with valid JSON only."},
+                {"role": "system", "content": "You are a legal analysis assistant. Always respond with valid JSON only. Always provide summaries and alerts in English, regardless of the input language."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
@@ -99,8 +101,38 @@ Respond in this exact JSON format:
 
 
 def analyze_with_rules(text: str) -> Dict[str, any]:
-    """Rule-based analysis as fallback when OpenAI is not available."""
+    """
+    Rule-based analysis as fallback when OpenAI is not available.
+    Note: This method works best with English text. For non-English text,
+    OpenAI API is recommended for accurate multilingual analysis.
+    """
     text_lower = text.lower()
+    
+    # Detect if text appears to be non-English (simple heuristic)
+    # Check for common non-English characters/patterns
+    non_english_indicators = [
+        r'[àáâãäåæçèéêëìíîïñòóôõöùúûüýÿ]',  # Common accented characters
+        r'[ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ]',
+        r'[α-ωΑ-Ω]',  # Greek
+        r'[一-龯]',  # Chinese/Japanese/Korean (CJK)
+        r'[А-Яа-я]',  # Cyrillic
+        r'[א-ת]',  # Hebrew
+        r'[ا-ي]',  # Arabic
+    ]
+    
+    is_likely_non_english = any(re.search(pattern, text) for pattern in non_english_indicators)
+    
+    if is_likely_non_english:
+        # For non-English text, provide a note that OpenAI is recommended
+        return {
+            "summary": "This document appears to be in a non-English language. For accurate analysis of non-English Terms & Conditions, please configure an OpenAI API key. The system can analyze multilingual content when OpenAI is available.",
+            "risk_score": "Medium",
+            "alerts": [
+                "Document appears to be in a non-English language",
+                "For best results with multilingual content, use OpenAI API",
+                "Please review the original document carefully"
+            ]
+        }
 
     alerts = []
     risk_score = "Low"
@@ -193,3 +225,4 @@ def analyze_with_rules(text: str) -> Dict[str, any]:
         "risk_score": risk_score,
         "alerts": alerts
     }
+
